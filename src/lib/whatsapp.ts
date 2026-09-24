@@ -54,16 +54,27 @@ export function generateAdminContactCustomerWhatsAppLink(
   customerName: string,
   totalAmount: number,
   deliveryType: string,
-  deliveryAddress?: string
+  deliveryAddress?: string,
+  items?: { product_name: string; quantity: number; subtotal: number }[]
 ): string {
   const phone = cleanPhone(customerPhone);
   const deliveryText =
     deliveryType === 'delivery'
-      ? `para envío a: *${deliveryAddress || 'tu dirección'}*`
-      : `para *retiro en local*`;
+      ? `🛵 *Envío a Domicilio* (📍 ${deliveryAddress || 'Dirección registrada'})`
+      : `🏪 *Retiro en Local*`;
 
-  const message = `👋 *¡Hola ${customerName}!* Te contactamos de *Kaibutsu Market* referente a tu *Pedido #${orderNumber}* (${deliveryText}) por un total de *${formatPrice(totalAmount)}*.\n\n` +
-    `Te escribimos para coordinar los detalles y confirmarte la disponibilidad. ¿Podrías confirmar si todo está correcto?`;
+  let itemsDetail = '';
+  if (items && items.length > 0) {
+    itemsDetail =
+      '\n\n📋 *Detalle de tu pedido:*\n' +
+      items.map((i) => `• ${i.quantity}x ${i.product_name} (${formatPrice(i.subtotal)})`).join('\n');
+  }
+
+  const message = `👋 *¡Hola ${customerName}!* Te contactamos de *Kaibutsu Market* referente a tu *Pedido #${orderNumber}*:\n\n` +
+    `📦 *Modalidad:* ${deliveryText}` +
+    `${itemsDetail}\n\n` +
+    `💰 *Total a pagar:* ${formatPrice(totalAmount)}\n\n` +
+    `_Te escribimos para coordinar los detalles y confirmarte la disponibilidad. ¿Nos confirmas si todo está correcto para prepararlo?_`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }

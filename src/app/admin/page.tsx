@@ -396,7 +396,8 @@ export default function AdminDashboardPage() {
                   order.customer_name,
                   order.total_amount,
                   order.delivery_type,
-                  order.delivery_address
+                  order.delivery_address,
+                  order.items
                 );
 
                 return (
