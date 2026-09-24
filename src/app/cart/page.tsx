@@ -72,7 +72,27 @@ export default function CartPage() {
           Número de Pedido: <span className="font-bold text-neutral-900">#{createdOrder.order_number}</span>
         </p>
 
-        <div className="my-6 p-4 rounded-2xl bg-neutral-50 text-left border border-neutral-100 space-y-2 text-xs text-neutral-700">
+        {/* Estado del Pedido y Aviso de Agilización */}
+        <div className="mt-4 mb-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          <span>Estado: Tu pedido ya está en proceso</span>
+        </div>
+
+        <div className="my-5 p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 text-left">
+          <div className="flex items-start gap-3">
+            <span className="text-xl leading-none">⚡</span>
+            <div className="text-xs text-emerald-950">
+              <p className="font-bold text-emerald-900 text-sm mb-1">
+                ¿Quieres recibir tu pedido más rápido?
+              </p>
+              <p className="text-emerald-800 leading-relaxed">
+                Tu pedido ya quedó guardado en el sistema, pero <strong>te recomendamos presionar el botón de WhatsApp abajo</strong> para dar aviso directo al personal de la tienda y agilizar de inmediato la preparación y entrega.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 p-4 rounded-2xl bg-neutral-50 text-left border border-neutral-100 space-y-2 text-xs text-neutral-700">
           <div className="flex justify-between">
             <span className="text-neutral-500">Entrega:</span>
             <span className="font-semibold capitalize">
@@ -96,10 +116,10 @@ export default function CartPage() {
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group"
+            className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group ring-4 ring-emerald-500/20"
           >
-            <MessageCircle className="w-5 h-5 fill-white" />
-            <span>Enviar Pedido a la Tienda por WhatsApp</span>
+            <MessageCircle className="w-5 h-5 fill-white animate-bounce" />
+            <span>Avisar a la Tienda por WhatsApp</span>
           </a>
 
           <Link
