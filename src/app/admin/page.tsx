@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Product, Order } from '@/lib/db';
 import { formatPrice, generateAdminContactCustomerWhatsAppLink } from '@/lib/whatsapp';
 import {
@@ -26,7 +27,16 @@ import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
+  const { showToast } = useToast();
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'settings'>('orders');
+
+  // Horario y Tienda
+  const [storeSettings, setStoreSettings] = useState({
+    is_open: true,
+    schedule_text: '',
+    announcement_text: '',
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
 
   // Pedidos
   const [orders, setOrders] = useState<Order[]>([]);
@@ -77,10 +87,48 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      if (data.settings) {
+        setStoreSettings({
+          is_open: data.settings.is_open,
+          schedule_text: data.settings.schedule_text || '',
+          announcement_text: data.settings.announcement_text || '',
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(storeSettings),
+      });
+      if (res.ok) {
+        showToast('Horario y estado de atención actualizados', 'success');
+      } else {
+        showToast('Error al actualizar horarios', 'error');
+      }
+    } catch (e) {
+      showToast('Error de conexión', 'error');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && user && (user.role === 'admin' || user.role === 'superadmin')) {
       fetchOrders();
       fetchProducts();
+      fetchSettings();
     }
   }, [authLoading, user, selectedStatus]);
 
@@ -115,10 +163,14 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
+        showToast(`Pedido actualizado a estado: ${newStatus}`, 'success');
         fetchOrders();
         fetchProducts(); // refrescar stock por si hubo reintegro
+      } else {
+        showToast('Error al actualizar estado del pedido', 'error');
       }
     } catch (e) {
+      showToast('Error de red al actualizar pedido', 'error');
       console.error(e);
     }
   };
@@ -126,13 +178,23 @@ export default function AdminDashboardPage() {
   // Acciones en productos
   const handleToggleProductAvailability = async (product: Product) => {
     try {
+      const nextState = !product.is_available;
       const res = await fetch(`/api/products/${product.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_available: !product.is_available }),
+        body: JSON.stringify({ is_available: nextState }),
       });
-      if (res.ok) fetchProducts();
+      if (res.ok) {
+        showToast(
+          `"${product.name}" marcado como ${nextState ? 'Disponible' : 'Agotado'}`,
+          nextState ? 'success' : 'info'
+        );
+        fetchProducts();
+      } else {
+        showToast('Error al cambiar disponibilidad', 'error');
+      }
     } catch (e) {
+      showToast('Error al cambiar disponibilidad', 'error');
       console.error(e);
     }
   };
@@ -145,8 +207,14 @@ export default function AdminDashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stock: newStock }),
       });
-      if (res.ok) fetchProducts();
+      if (res.ok) {
+        showToast(`Stock de "${product.name}" actualizado a ${newStock} un.`, 'success');
+        fetchProducts();
+      } else {
+        showToast('Error al actualizar stock', 'error');
+      }
     } catch (e) {
+      showToast('Error al actualizar stock', 'error');
       console.error(e);
     }
   };
@@ -155,8 +223,14 @@ export default function AdminDashboardPage() {
     if (!confirm('¿Seguro que deseas eliminar este producto del catálogo?')) return;
     try {
       const res = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
-      if (res.ok) fetchProducts();
+      if (res.ok) {
+        showToast('Producto eliminado del catálogo', 'info');
+        fetchProducts();
+      } else {
+        showToast('Error al eliminar producto', 'error');
+      }
     } catch (e) {
+      showToast('Error al eliminar producto', 'error');
       console.error(e);
     }
   };
@@ -166,23 +240,34 @@ export default function AdminDashboardPage() {
     try {
       if (editingProduct) {
         // Editar
-        await fetch(`/api/products/${editingProduct.id}`, {
+        const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
+        if (res.ok) {
+          showToast(`Producto "${formData.name}" actualizado con éxito`, 'success');
+        } else {
+          showToast('Error al guardar cambios del producto', 'error');
+        }
       } else {
         // Crear
-        await fetch('/api/products', {
+        const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
+        if (res.ok) {
+          showToast(`Producto "${formData.name}" añadido al catálogo`, 'success');
+        } else {
+          showToast('Error al crear el producto', 'error');
+        }
       }
       setIsProductModalOpen(false);
       setEditingProduct(null);
       fetchProducts();
     } catch (e) {
+      showToast('Error de conexión al guardar producto', 'error');
       console.error(e);
     }
   };
@@ -249,6 +334,18 @@ export default function AdminDashboardPage() {
           >
             <Layers className="w-4 h-4 text-emerald-600" />
             <span>Inventario / Stock</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'settings'
+                ? 'bg-white text-neutral-900 shadow-xs'
+                : 'text-neutral-600 hover:text-neutral-900'
+            }`}
+          >
+            <Clock className="w-4 h-4 text-emerald-600" />
+            <span>Horarios & Estado</span>
           </button>
         </div>
       </div>
@@ -533,6 +630,132 @@ export default function AdminDashboardPage() {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* VISTA 3: CONFIGURACIÓN DE HORARIOS & ESTADO DE ATENCIÓN */}
+      {activeTab === 'settings' && (
+        <div className="bg-white rounded-3xl border border-neutral-200 p-6 sm:p-8 shadow-sm max-w-2xl">
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-neutral-900">Horario de Atención y Estado del Local</h2>
+            <p className="text-xs text-neutral-500 mt-1">
+              Controla el cartel visible para los clientes con el estado de apertura y los horarios comerciales.
+            </p>
+          </div>
+
+          <form onSubmit={handleSaveSettings} className="space-y-5">
+            {/* Switch de Estado Abierto / Cerrado con Cartel Previo */}
+            <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-between gap-4">
+              <div>
+                <span className="block text-sm font-bold text-neutral-900">Estado de Atención</span>
+                <span className="text-xs text-neutral-500 font-medium">
+                  {storeSettings.is_open
+                    ? 'El local se muestra como "Atendiendo Ahora" con luz verde intermitente'
+                    : 'El local se muestra como "Cerrado por ahora"'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStoreSettings({ ...storeSettings, is_open: !storeSettings.is_open })}
+                className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  storeSettings.is_open ? 'bg-emerald-600' : 'bg-neutral-300'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    storeSettings.is_open ? 'translate-x-7' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-800 mb-1.5">
+                Texto del Horario de Atención *
+              </label>
+              <input
+                type="text"
+                required
+                value={storeSettings.schedule_text}
+                onChange={(e) => setStoreSettings({ ...storeSettings, schedule_text: e.target.value })}
+                placeholder="Ej. Lunes a Sábado: 09:00 - 21:00 hrs | Domingo: 10:00 - 15:00 hrs"
+                className="w-full px-3.5 py-2.5 text-sm font-medium rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+              />
+              <span className="text-xs text-neutral-500 mt-1 block">
+                Este texto se muestra en el banner superior de la página principal.
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-800 mb-1.5">
+                Mensaje o Anuncio Especial (Opcional)
+              </label>
+              <input
+                type="text"
+                value={storeSettings.announcement_text}
+                onChange={(e) => setStoreSettings({ ...storeSettings, announcement_text: e.target.value })}
+                placeholder="Ej. ¡Estamos atendiendo con despacho a domicilio rápido!"
+                className="w-full px-3.5 py-2.5 text-sm font-medium rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+              />
+            </div>
+
+            {/* Vista Previa del Cartel */}
+            <div className="pt-2">
+              <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                Vista previa del cartel:
+              </span>
+              <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-xs flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-neutral-100 text-emerald-600">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-neutral-400 uppercase block">Horario</span>
+                    <span className="text-sm font-bold text-neutral-900">
+                      {storeSettings.schedule_text || 'Sin horario definido'}
+                    </span>
+                    {storeSettings.announcement_text && (
+                      <span className="text-xs text-neutral-600 block mt-0.5 font-medium">
+                        {storeSettings.announcement_text}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  {storeSettings.is_open ? (
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                      <span className="text-[11px] font-black uppercase tracking-wider">
+                        ● Atendiendo
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700">
+                      <span className="h-2 w-2 rounded-full bg-red-500"></span>
+                      <span className="text-[11px] font-black uppercase tracking-wider">
+                        Cerrado
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingSettings}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all disabled:opacity-60 cursor-pointer"
+              >
+                {savingSettings ? 'Guardando...' : 'Guardar Horario & Estado'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

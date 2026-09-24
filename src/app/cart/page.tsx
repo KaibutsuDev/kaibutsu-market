@@ -2,6 +2,7 @@
 
 import { useCartStore } from '@/store/cartStore';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { formatPrice, generateCustomerOrderWhatsAppLink } from '@/lib/whatsapp';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Store, MessageCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import { useState, useEffect } from 'react';
 
 export default function CartPage() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCartStore();
 
   const [mounted, setMounted] = useState(false);
@@ -222,7 +224,10 @@ export default function CartPage() {
               {/* Quantity controls */}
               <div className="flex items-center gap-2 bg-neutral-100 p-1 rounded-xl">
                 <button
-                  onClick={() => updateQuantity(product.id, quantity - 1)}
+                  onClick={() => {
+                    updateQuantity(product.id, quantity - 1);
+                    showToast(`Cantidad de ${product.name}: ${quantity - 1}`, 'info');
+                  }}
                   className="w-7 h-7 flex items-center justify-center rounded-lg bg-white text-neutral-700 shadow-xs hover:bg-neutral-50 transition-colors"
                 >
                   <Minus className="w-3.5 h-3.5" />
@@ -231,7 +236,14 @@ export default function CartPage() {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => updateQuantity(product.id, quantity + 1)}
+                  onClick={() => {
+                    if (quantity < product.stock) {
+                      updateQuantity(product.id, quantity + 1);
+                      showToast(`Cantidad de ${product.name}: ${quantity + 1}`, 'success');
+                    } else {
+                      showToast(`Stock máximo alcanzado para ${product.name}`, 'error');
+                    }
+                  }}
                   disabled={quantity >= product.stock}
                   className="w-7 h-7 flex items-center justify-center rounded-lg bg-white text-neutral-700 shadow-xs hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
@@ -241,7 +253,10 @@ export default function CartPage() {
 
               {/* Delete button */}
               <button
-                onClick={() => removeItem(product.id)}
+                onClick={() => {
+                  removeItem(product.id);
+                  showToast(`${product.name} eliminado del carrito`, 'info');
+                }}
                 className="p-2 text-neutral-400 hover:text-red-600 transition-colors"
                 title="Eliminar"
               >

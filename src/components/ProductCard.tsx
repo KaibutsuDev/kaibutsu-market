@@ -3,6 +3,7 @@
 import { Product } from '@/lib/db';
 import { formatPrice } from '@/lib/whatsapp';
 import { useCartStore } from '@/store/cartStore';
+import { useToast } from '@/context/ToastContext';
 import { Plus, Check, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { useState } from 'react';
 export default function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
   const cartItems = useCartStore((state) => state.items);
+  const { showToast } = useToast();
   const [addedAnimation, setAddedAnimation] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -19,15 +21,24 @@ export default function ProductCard({ product }: { product: Product }) {
   const reachedMaxStock = currentQuantityInCart >= product.stock;
 
   const handleAddToCart = () => {
-    if (isOutOfStock || reachedMaxStock) return;
+    if (isOutOfStock) {
+      showToast(`"${product.name}" está agotado`, 'error');
+      return;
+    }
+    if (reachedMaxStock) {
+      showToast(`Alcanzaste el stock disponible de "${product.name}"`, 'error');
+      return;
+    }
 
     const success = addItem(product, 1);
     if (success) {
       setAddedAnimation(true);
       setErrorMsg(null);
+      showToast(`+1 ${product.name} agregado al carrito`, 'success');
       setTimeout(() => setAddedAnimation(false), 1200);
     } else {
       setErrorMsg('Límite de stock alcanzado');
+      showToast(`Límite de stock alcanzado para ${product.name}`, 'error');
       setTimeout(() => setErrorMsg(null), 2500);
     }
   };

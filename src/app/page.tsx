@@ -3,7 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Product } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
-import { Search, ShoppingBag, Sparkles, Filter } from 'lucide-react';
+import { Search, ShoppingBag, Sparkles, Filter, Clock, Store } from 'lucide-react';
+
+interface StoreSettings {
+  is_open: boolean;
+  schedule_text: string;
+  announcement_text?: string;
+}
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,6 +17,11 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<StoreSettings>({
+    is_open: true,
+    schedule_text: 'Lunes a Sábado: 09:00 - 21:00 hrs',
+    announcement_text: '',
+  });
 
   const fetchProducts = async () => {
     try {
@@ -31,8 +42,21 @@ export default function HomePage() {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      if (data.settings) {
+        setSettings(data.settings);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchSettings();
   }, []);
 
   const filteredProducts = products.filter((p) => {
@@ -45,7 +69,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Hero Banner */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white p-6 sm:p-10 shadow-sm">
         <div className="relative z-10 max-w-2xl space-y-3">
@@ -56,12 +80,58 @@ export default function HomePage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
             Pide en línea y confirma directo por WhatsApp
           </h1>
-          <p className="text-emerald-50 text-sm sm:text-base">
+          <p className="text-emerald-50 text-sm sm:text-base font-medium">
             Elige tus productos, agrega al carrito y coordina la entrega directamente con nosotros.
           </p>
         </div>
         <div className="absolute right-0 bottom-0 translate-x-8 translate-y-8 opacity-10 pointer-events-none">
           <ShoppingBag className="w-72 h-72 text-white" />
+        </div>
+      </section>
+
+      {/* Cartel de Horario de Atención y Estado (Atendiendo / Cerrado) */}
+      <section className="bg-white rounded-3xl border border-neutral-200 p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-3 rounded-2xl bg-neutral-100 text-neutral-700 shrink-0">
+            <Clock className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                Horario de Atención
+              </span>
+            </div>
+            <p className="text-sm font-bold text-neutral-900 mt-0.5">
+              {settings.schedule_text}
+            </p>
+            {settings.announcement_text && (
+              <p className="text-xs text-neutral-600 mt-0.5 font-medium">
+                {settings.announcement_text}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Cartel CSS Atendiendo / Cerrado con efecto Neumórfico / Glow */}
+        <div className="shrink-0 self-start md:self-center">
+          {settings.is_open ? (
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 shadow-xs">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-black uppercase tracking-wider">
+                ● Atendiendo Ahora
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-700 shadow-xs">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500"></span>
+              <span className="text-xs font-black uppercase tracking-wider">
+                Cerrado por ahora
+              </span>
+            </div>
+          )}
         </div>
       </section>
 
