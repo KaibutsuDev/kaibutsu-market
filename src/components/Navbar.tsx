@@ -27,7 +27,6 @@ export default function Navbar() {
             <span className="font-bold text-lg text-neutral-900 tracking-tight leading-none block">
               Kaibutsu Market
             </span>
-            <span className="text-xs text-neutral-500 font-medium">Compras Rápidas & WhatsApp</span>
           </div>
         </Link>
 

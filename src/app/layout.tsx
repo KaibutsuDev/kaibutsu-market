@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Kaibutsu Market - Tu almacén con pedidos por WhatsApp',
-  description: 'Catálogo online, carrito de compras sin pasarela de pago y coordinación directa por WhatsApp.',
+  description: 'Catálogo online, carrito de compras y coordinación directa por WhatsApp.',
 };
 
 export default function RootLayout({

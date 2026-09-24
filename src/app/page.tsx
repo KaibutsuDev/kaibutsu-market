@@ -51,7 +51,7 @@ export default function HomePage() {
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold tracking-wide uppercase">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Sin pasarelas ni comisiones raras</span>
+            <span>Tu almacén favorito online</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
             Pide en línea y confirma directo por WhatsApp
