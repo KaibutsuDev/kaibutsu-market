@@ -4,12 +4,13 @@ import { Product } from '@/lib/db';
 import { formatPrice } from '@/lib/whatsapp';
 import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/context/ToastContext';
-import { Plus, Check, AlertCircle } from 'lucide-react';
+import { Plus, Minus, Check, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
 export default function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
   const cartItems = useCartStore((state) => state.items);
   const { showToast } = useToast();
   const [addedAnimation, setAddedAnimation] = useState(false);
@@ -40,6 +41,24 @@ export default function ProductCard({ product }: { product: Product }) {
       setErrorMsg('Límite de stock alcanzado');
       showToast(`Límite de stock alcanzado para ${product.name}`, 'error');
       setTimeout(() => setErrorMsg(null), 2500);
+    }
+  };
+
+  const handleIncrease = () => {
+    if (reachedMaxStock) {
+      showToast(`Stock máximo alcanzado para ${product.name}`, 'error');
+      return;
+    }
+    updateQuantity(product.id, currentQuantityInCart + 1);
+    showToast(`Cantidad de ${product.name}: ${currentQuantityInCart + 1}`, 'success');
+  };
+
+  const handleDecrease = () => {
+    updateQuantity(product.id, currentQuantityInCart - 1);
+    if (currentQuantityInCart - 1 === 0) {
+      showToast(`${product.name} quitado del carrito`, 'info');
+    } else {
+      showToast(`Cantidad de ${product.name}: ${currentQuantityInCart - 1}`, 'info');
     }
   };
 
@@ -105,33 +124,57 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock || reachedMaxStock}
-            className={`flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 ${
-              isOutOfStock
-                ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-                : reachedMaxStock
-                ? 'bg-amber-100 text-amber-800 cursor-not-allowed'
-                : addedAnimation
-                ? 'bg-emerald-600 text-white scale-95'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs hover:shadow'
-            }`}
-          >
-            {addedAnimation ? (
-              <>
-                <Check className="w-3.5 h-3.5 shrink-0" />
-                <span>¡Listo!</span>
-              </>
-            ) : reachedMaxStock ? (
-              <span>Límite ({currentQuantityInCart})</span>
-            ) : (
-              <>
-                <Plus className="w-3.5 h-3.5 shrink-0" />
-                <span>{currentQuantityInCart > 0 ? `+1 (${currentQuantityInCart})` : 'Añadir'}</span>
-              </>
-            )}
-          </button>
+          {/* Controles de Compra */}
+          {currentQuantityInCart > 0 ? (
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-emerald-50 border border-emerald-200/80 p-1 rounded-xl shadow-xs shrink-0">
+              <button
+                type="button"
+                onClick={handleDecrease}
+                className="w-7 h-7 flex items-center justify-center rounded-lg bg-white text-emerald-800 shadow-xs hover:bg-emerald-100 transition-colors cursor-pointer"
+                title="Quitar uno"
+              >
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+
+              <span className="w-5 sm:w-6 text-center text-xs font-black text-emerald-950">
+                {currentQuantityInCart}
+              </span>
+
+              <button
+                type="button"
+                onClick={handleIncrease}
+                disabled={reachedMaxStock}
+                className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                title={reachedMaxStock ? 'Stock máximo alcanzado' : 'Añadir otro'}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+              className={`flex items-center justify-center gap-1 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                isOutOfStock
+                  ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                  : addedAnimation
+                  ? 'bg-emerald-600 text-white scale-95'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs hover:shadow'
+              }`}
+            >
+              {addedAnimation ? (
+                <>
+                  <Check className="w-3.5 h-3.5 shrink-0" />
+                  <span>¡Listo!</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="w-3.5 h-3.5 shrink-0" />
+                  <span>Añadir</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {errorMsg && (
