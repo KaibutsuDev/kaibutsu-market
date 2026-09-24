@@ -87,20 +87,20 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Product Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-semibold text-neutral-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+          <h3 className="font-semibold text-neutral-900 line-clamp-1 group-hover:text-emerald-700 transition-colors text-sm sm:text-base">
             {product.name}
           </h3>
-          <p className="text-xs text-neutral-500 mt-1 line-clamp-2 min-h-[32px]">
+          <p className="text-[11px] sm:text-xs text-neutral-500 mt-0.5 line-clamp-2 min-h-[30px]">
             {product.description || 'Producto disponible para compra inmediata'}
           </p>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-neutral-400 block font-medium">Precio</span>
-            <span className="text-lg font-bold text-neutral-900">
+        <div className="mt-3 pt-2.5 border-t border-neutral-100 flex items-center justify-between gap-1.5">
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] sm:text-xs text-neutral-400 block font-medium leading-none">Precio</span>
+            <span className="text-sm sm:text-lg font-bold text-neutral-900 tracking-tight leading-tight block truncate">
               {formatPrice(product.price)}
             </span>
           </div>
@@ -108,26 +108,26 @@ export default function ProductCard({ product }: { product: Product }) {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock || reachedMaxStock}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 ${
               isOutOfStock
                 ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                 : reachedMaxStock
                 ? 'bg-amber-100 text-amber-800 cursor-not-allowed'
                 : addedAnimation
                 ? 'bg-emerald-600 text-white scale-95'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm hover:shadow'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs hover:shadow'
             }`}
           >
             {addedAnimation ? (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="w-3.5 h-3.5 shrink-0" />
                 <span>¡Listo!</span>
               </>
             ) : reachedMaxStock ? (
               <span>Límite ({currentQuantityInCart})</span>
             ) : (
               <>
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span>{currentQuantityInCart > 0 ? `+1 (${currentQuantityInCart})` : 'Añadir'}</span>
               </>
             )}
@@ -135,9 +135,9 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         {errorMsg && (
-          <p className="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
-            <AlertCircle className="w-3.5 h-3.5" />
-            {errorMsg}
+          <p className="mt-1.5 text-[11px] text-red-500 font-medium flex items-center gap-1">
+            <AlertCircle className="w-3 h-3 shrink-0" />
+            <span>{errorMsg}</span>
           </p>
         )}
       </div>
