@@ -33,6 +33,7 @@ export default function AdminDashboardPage() {
   // Horario y Tienda
   const [storeSettings, setStoreSettings] = useState({
     is_open: true,
+    store_phone: '56912345678',
     schedule_text: '',
     announcement_text: '',
   });
@@ -94,6 +95,7 @@ export default function AdminDashboardPage() {
       if (data.settings) {
         setStoreSettings({
           is_open: data.settings.is_open,
+          store_phone: data.settings.store_phone || '56912345678',
           schedule_text: data.settings.schedule_text || '',
           announcement_text: data.settings.announcement_text || '',
         });
@@ -668,6 +670,26 @@ export default function AdminDashboardPage() {
                   }`}
                 />
               </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-800 mb-1.5">
+                Número de WhatsApp de la Tienda (Para recibir pedidos) *
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                <input
+                  type="tel"
+                  required
+                  value={storeSettings.store_phone}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_phone: e.target.value })}
+                  placeholder="Ej. +56912345678 o 56912345678"
+                  className="w-full pl-10 pr-3.5 py-2.5 text-sm font-medium rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                />
+              </div>
+              <span className="text-xs text-neutral-500 mt-1 block">
+                Los clientes enviarán los pedidos de WhatsApp a este número telefónico.
+              </span>
             </div>
 
             <div>

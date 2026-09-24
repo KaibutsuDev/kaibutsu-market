@@ -11,6 +11,7 @@ export async function GET() {
       return NextResponse.json({
         settings: {
           is_open: true,
+          store_phone: '56912345678',
           schedule_text: 'Lunes a Sábado: 09:00 - 21:00 hrs',
           announcement_text: '¡Estamos atendiendo pedidos!',
         },
@@ -19,7 +20,7 @@ export async function GET() {
     return NextResponse.json({ settings: rows[0] });
   } catch (error) {
     console.error('Error al obtener configuración de tienda:', error);
-    return NextResponse.json({ error: 'Error al cargar horarios' }, { status: 500 });
+    return NextResponse.json({ error: 'Error al cargar configuración' }, { status: 500 });
   }
 }
 
@@ -30,12 +31,13 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
-    const { is_open, schedule_text, announcement_text } = await req.json();
+    const { is_open, store_phone, schedule_text, announcement_text } = await req.json();
 
     const updated = await sql`
       UPDATE minimarket.store_settings
       SET 
         is_open = ${is_open !== undefined ? Boolean(is_open) : true},
+        store_phone = ${store_phone !== undefined ? store_phone.trim() : '56912345678'},
         schedule_text = ${schedule_text !== undefined ? schedule_text.trim() : 'Lunes a Sábado: 09:00 - 21:00 hrs'},
         announcement_text = ${announcement_text !== undefined ? announcement_text.trim() : ''},
         updated_at = CURRENT_TIMESTAMP
@@ -46,6 +48,6 @@ export async function PUT(req: Request) {
     return NextResponse.json({ settings: updated[0] });
   } catch (error) {
     console.error('Error al actualizar configuración de tienda:', error);
-    return NextResponse.json({ error: 'Error al actualizar horarios' }, { status: 500 });
+    return NextResponse.json({ error: 'Error al actualizar configuración' }, { status: 500 });
   }
 }

@@ -11,6 +11,7 @@ export default function CustomerOrdersPage() {
   const { user, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [storePhone, setStorePhone] = useState<string>('56912345678');
 
   const fetchOrders = async () => {
     try {
@@ -33,6 +34,15 @@ export default function CustomerOrdersPage() {
     } else if (!authLoading && !user) {
       setLoading(false);
     }
+
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.store_phone) {
+          setStorePhone(data.settings.store_phone);
+        }
+      })
+      .catch((e) => console.error(e));
   }, [authLoading, user]);
 
   if (authLoading || loading) {
@@ -95,8 +105,6 @@ export default function CustomerOrdersPage() {
         return null;
     }
   };
-
-  const storePhone = process.env.NEXT_PUBLIC_STORE_PHONE || '56912345678';
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

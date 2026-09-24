@@ -20,12 +20,23 @@ export default function CartPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdOrder, setCreatedOrder] = useState<any | null>(null);
+  const [storePhone, setStorePhone] = useState<string>('56912345678');
 
   useEffect(() => {
     setMounted(true);
     if (user?.default_address) {
       setDeliveryAddress(user.default_address);
     }
+
+    // Obtener número configurado por el admin
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.store_phone) {
+          setStorePhone(data.settings.store_phone);
+        }
+      })
+      .catch((e) => console.error(e));
   }, [user]);
 
   if (!mounted) {
@@ -38,7 +49,6 @@ export default function CartPage() {
 
   // Vista de pedido exitoso con Botón de WhatsApp
   if (createdOrder) {
-    const storePhone = process.env.NEXT_PUBLIC_STORE_PHONE || '56912345678';
     const whatsappLink = generateCustomerOrderWhatsAppLink(
       storePhone,
       createdOrder.order_number,
