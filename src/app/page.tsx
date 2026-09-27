@@ -73,10 +73,6 @@ export default function HomePage() {
       {/* Hero Banner */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white p-6 sm:p-10 shadow-sm">
         <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold tracking-wide uppercase">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Tu almacén favorito online</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
             Pide en línea y confirma directo por WhatsApp
           </h1>
@@ -121,7 +117,7 @@ export default function HomePage() {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
               </span>
               <span className="text-xs font-black uppercase tracking-wider">
-                ● Atendiendo Ahora
+                Atendiendo Ahora
               </span>
             </div>
           ) : (
