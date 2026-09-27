@@ -11,9 +11,10 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
+    const scope = searchParams.get('scope'); // 'mine' para ver solo pedidos propios
 
     let orders;
-    if (auth.role === 'admin' || auth.role === 'superadmin') {
+    if ((auth.role === 'admin' || auth.role === 'superadmin') && scope !== 'mine') {
       if (status === 'completed') {
         orders = await sql`
           SELECT * FROM minimarket.orders 
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
         `;
       }
     } else {
-      // Cliente regular solo ve sus pedidos
+      // Cliente regular o administrador viendo sus compras personales
       orders = await sql`
         SELECT * FROM minimarket.orders 
         WHERE customer_id = ${auth.userId}

@@ -16,7 +16,7 @@ export default function CustomerOrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/orders');
+      const res = await fetch('/api/orders?scope=mine');
       const data = await res.json();
       if (data.orders) {
         setOrders(data.orders);
