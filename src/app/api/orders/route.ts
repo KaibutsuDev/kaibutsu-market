@@ -14,7 +14,13 @@ export async function GET(req: Request) {
 
     let orders;
     if (auth.role === 'admin' || auth.role === 'superadmin') {
-      if (status && status !== 'all') {
+      if (status === 'completed') {
+        orders = await sql`
+          SELECT * FROM minimarket.orders 
+          WHERE status IN ('confirmed', 'delivered')
+          ORDER BY created_at DESC
+        `;
+      } else if (status && status !== 'all') {
         orders = await sql`
           SELECT * FROM minimarket.orders 
           WHERE status = ${status}

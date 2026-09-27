@@ -81,17 +81,11 @@ export default function CustomerOrdersPage() {
           </span>
         );
       case 'confirmed':
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-            <Package className="w-3.5 h-3.5" />
-            <span>Confirmado</span>
-          </span>
-        );
       case 'delivered':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Entregado</span>
+            <span>Completado</span>
           </span>
         );
       case 'cancelled':

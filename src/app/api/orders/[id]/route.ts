@@ -69,3 +69,54 @@ export async function PATCH(
     return NextResponse.json({ error: 'Error al actualizar pedido' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const auth = await getAuthUser();
+    if (!auth || (auth.role !== 'admin' && auth.role !== 'superadmin')) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const { pin }: { pin?: string } = await req.json();
+
+    const REQUIRED_PIN = process.env.ADMIN_SECURITY_PIN || '4321';
+    if (!pin || pin.trim() !== REQUIRED_PIN) {
+      return NextResponse.json({ error: 'PIN de seguridad incorrecto' }, { status: 401 });
+    }
+
+    const currentOrder = await sql`SELECT * FROM minimarket.orders WHERE id = ${id}`;
+    if (currentOrder.length === 0) {
+      return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 });
+    }
+
+    // Si el pedido no estaba cancelado, reintegrar el stock de los productos
+    if (currentOrder[0].status !== 'cancelled') {
+      const items = await sql`SELECT product_id, quantity FROM minimarket.order_items WHERE order_id = ${id}`;
+      for (const item of items) {
+        if (item.product_id) {
+          await sql`
+            UPDATE minimarket.products
+            SET stock = stock + ${item.quantity},
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${item.product_id}
+          `;
+        }
+      }
+    }
+
+    // Eliminar order_items primero
+    await sql`DELETE FROM minimarket.order_items WHERE order_id = ${id}`;
+    // Eliminar el pedido
+    await sql`DELETE FROM minimarket.orders WHERE id = ${id}`;
+
+    return NextResponse.json({ success: true, message: 'Pedido eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar el pedido:', error);
+    return NextResponse.json({ error: 'Error al eliminar el pedido' }, { status: 500 });
+  }
+}
+
