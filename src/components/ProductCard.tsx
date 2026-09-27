@@ -119,24 +119,25 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="mt-3 pt-2.5 border-t border-neutral-100 flex items-center justify-between gap-1.5">
           <div className="min-w-0 flex-1">
             <span className="text-[10px] sm:text-xs text-neutral-400 block font-medium leading-none">Precio</span>
-            <span className="text-sm sm:text-lg font-bold text-neutral-900 tracking-tight leading-tight block truncate">
-              {formatPrice(product.price)}
+            <span className="text-sm sm:text-base font-extrabold text-emerald-700 tracking-tight leading-tight block truncate tabular-nums">
+              {formatPrice(product.price)} CLP
             </span>
           </div>
 
-          {/* Controles de Compra */}
+          {/* Controles de Compra estilo Minimarket SaaS */}
           {currentQuantityInCart > 0 ? (
-            <div className="flex items-center gap-1 sm:gap-1.5 bg-emerald-50 border border-emerald-200/80 p-1 rounded-xl shadow-xs shrink-0">
+            <div className="flex items-center gap-1 bg-white border border-neutral-200/90 rounded-xl p-1 shadow-xs shrink-0 ring-1 ring-neutral-900/5">
               <button
                 type="button"
                 onClick={handleDecrease}
-                className="w-7 h-7 flex items-center justify-center rounded-lg bg-white text-emerald-800 shadow-xs hover:bg-emerald-100 transition-colors cursor-pointer"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-neutral-800 font-bold hover:bg-neutral-100 active:scale-90 transition-all cursor-pointer"
                 title="Quitar uno"
+                aria-label="Restar una unidad"
               >
-                <Minus className="w-3.5 h-3.5" />
+                <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
               </button>
 
-              <span className="w-5 sm:w-6 text-center text-xs font-black text-emerald-950">
+              <span className="min-w-[20px] sm:min-w-[24px] text-center text-xs sm:text-sm font-extrabold text-neutral-900 px-1 tabular-nums">
                 {currentQuantityInCart}
               </span>
 
@@ -144,32 +145,33 @@ export default function ProductCard({ product }: { product: Product }) {
                 type="button"
                 onClick={handleIncrease}
                 disabled={reachedMaxStock}
-                className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-700 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
                 title={reachedMaxStock ? 'Stock máximo alcanzado' : 'Añadir otro'}
+                aria-label="Sumar una unidad"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               </button>
             </div>
           ) : (
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className={`flex items-center justify-center gap-1 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer shadow-xs active:scale-95 ${
                 isOutOfStock
                   ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                   : addedAnimation
                   ? 'bg-emerald-600 text-white scale-95'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs hover:shadow'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-md'
               }`}
             >
               {addedAnimation ? (
                 <>
-                  <Check className="w-3.5 h-3.5 shrink-0" />
+                  <Check className="w-3.5 h-3.5 shrink-0 stroke-[2.5]" />
                   <span>¡Listo!</span>
                 </>
               ) : (
                 <>
-                  <Plus className="w-3.5 h-3.5 shrink-0" />
+                  <Plus className="w-3.5 h-3.5 shrink-0 stroke-[2.5]" />
                   <span>Añadir</span>
                 </>
               )}
