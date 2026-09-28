@@ -8,6 +8,7 @@ import { Search, ShoppingBag, Sparkles, Filter, Clock, Store } from 'lucide-reac
 import FlashSaleModule from '@/components/modules/FlashSaleModule';
 import CombosModule from '@/components/modules/CombosModule';
 import FreshBreadModule from '@/components/modules/FreshBreadModule';
+import StoreSignage, { SignageStyle } from '@/components/StoreSignage';
 
 interface StoreSettings {
   is_open: boolean;
@@ -17,6 +18,7 @@ interface StoreSettings {
   module_combos_dia?: boolean;
   module_vitrina_pan?: boolean;
   module_pedidos_programados?: boolean;
+  signage_style?: SignageStyle | string;
 }
 
 export default function HomePage() {
@@ -116,26 +118,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Cartel CSS Atendiendo / Cerrado con efecto Neumórfico / Glow */}
+        {/* Cartel Dinámico Atendiendo / Cerrado Seleccionable */}
         <div className="shrink-0 self-start md:self-center">
-          {settings.is_open ? (
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 shadow-xs">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-              </span>
-              <span className="text-xs font-black uppercase tracking-wider">
-                Atendiendo Ahora
-              </span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-700 shadow-xs">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-500"></span>
-              <span className="text-xs font-black uppercase tracking-wider">
-                Cerrado por ahora
-              </span>
-            </div>
-          )}
+          <StoreSignage
+            isOpen={settings.is_open}
+            style={settings.signage_style || 'hanging'}
+          />
         </div>
       </section>
 

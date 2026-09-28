@@ -18,6 +18,7 @@ export async function GET() {
           module_combos_dia: false,
           module_vitrina_pan: false,
           module_pedidos_programados: false,
+          signage_style: 'hanging',
         },
       });
     }
@@ -44,6 +45,7 @@ export async function PUT(req: Request) {
       module_combos_dia,
       module_vitrina_pan,
       module_pedidos_programados,
+      signage_style,
     } = await req.json();
 
     const updated = await sql`
@@ -57,6 +59,7 @@ export async function PUT(req: Request) {
         module_combos_dia = ${module_combos_dia !== undefined ? Boolean(module_combos_dia) : false},
         module_vitrina_pan = ${module_vitrina_pan !== undefined ? Boolean(module_vitrina_pan) : false},
         module_pedidos_programados = ${module_pedidos_programados !== undefined ? Boolean(module_pedidos_programados) : false},
+        signage_style = ${signage_style !== undefined ? signage_style.trim() : 'hanging'},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = 'current'
       RETURNING *
