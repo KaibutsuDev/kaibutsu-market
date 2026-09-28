@@ -10,9 +10,18 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const totalItems = useCartStore((state) => state.getTotalItems());
   const [mounted, setMounted] = useState(false);
+  const [storeName, setStoreName] = useState('Kaibutsu Market');
+  const [logoUrl, setLogoUrl] = useState('');
 
   useEffect(() => {
     setMounted(true);
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.store_name) setStoreName(data.settings.store_name);
+        if (data.settings?.logo_url) setLogoUrl(data.settings.logo_url);
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -20,12 +29,16 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
-            <Store className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
+            {logoUrl ? (
+              <img src={logoUrl} alt={storeName} className="w-full h-full object-cover" />
+            ) : (
+              <Store className="w-6 h-6" />
+            )}
           </div>
           <div>
             <span className="font-bold text-lg text-neutral-900 tracking-tight leading-none block">
-              Kaibutsu Market
+              {storeName}
             </span>
           </div>
         </Link>

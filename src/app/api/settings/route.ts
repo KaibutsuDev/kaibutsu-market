@@ -19,6 +19,12 @@ export async function GET() {
           module_vitrina_pan: false,
           module_pedidos_programados: false,
           signage_style: 'hanging',
+          store_name: 'Kaibutsu Market',
+          store_tagline: 'Tu almacén con pedidos por WhatsApp',
+          hero_title: 'Pide en línea y confirma directo por WhatsApp',
+          hero_subtitle: 'Elige tus productos, agrega al carrito y coordina la entrega directamente con nosotros.',
+          theme_color: 'emerald',
+          logo_url: '',
         },
       });
     }
@@ -46,6 +52,12 @@ export async function PUT(req: Request) {
       module_vitrina_pan,
       module_pedidos_programados,
       signage_style,
+      store_name,
+      store_tagline,
+      hero_title,
+      hero_subtitle,
+      theme_color,
+      logo_url,
     } = await req.json();
 
     const updated = await sql`
@@ -60,6 +72,12 @@ export async function PUT(req: Request) {
         module_vitrina_pan = ${module_vitrina_pan !== undefined ? Boolean(module_vitrina_pan) : false},
         module_pedidos_programados = ${module_pedidos_programados !== undefined ? Boolean(module_pedidos_programados) : false},
         signage_style = ${signage_style !== undefined ? signage_style.trim() : 'hanging'},
+        store_name = ${store_name !== undefined ? store_name.trim() : 'Kaibutsu Market'},
+        store_tagline = ${store_tagline !== undefined ? store_tagline.trim() : 'Tu almacén con pedidos por WhatsApp'},
+        hero_title = ${hero_title !== undefined ? hero_title.trim() : 'Pide en línea y confirma directo por WhatsApp'},
+        hero_subtitle = ${hero_subtitle !== undefined ? hero_subtitle.trim() : 'Elige tus productos, agrega al carrito y coordina la entrega directamente con nosotros.'},
+        theme_color = ${theme_color !== undefined ? theme_color.trim() : 'emerald'},
+        logo_url = ${logo_url !== undefined ? logo_url.trim() : ''},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = 'current'
       RETURNING *

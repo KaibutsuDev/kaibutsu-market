@@ -3,7 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Layers, Clock, AlertTriangle, Sparkles } from 'lucide-react';
+import { ShoppingBag, Layers, Clock, AlertTriangle, Sparkles, Palette } from 'lucide-react';
 
 export default function AdminLayout({
   children,
@@ -62,6 +62,12 @@ export default function AdminLayout({
       href: '/admin/modulos',
       label: 'Módulos de Prueba',
       icon: Sparkles,
+      exactMatch: false,
+    },
+    {
+      href: '/admin/personalizar',
+      label: 'Personalizar Tienda',
+      icon: Palette,
       exactMatch: false,
     },
   ];

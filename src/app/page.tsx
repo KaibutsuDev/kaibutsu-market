@@ -19,7 +19,21 @@ interface StoreSettings {
   module_vitrina_pan?: boolean;
   module_pedidos_programados?: boolean;
   signage_style?: SignageStyle | string;
+  store_name?: string;
+  store_tagline?: string;
+  hero_title?: string;
+  hero_subtitle?: string;
+  theme_color?: string;
+  logo_url?: string;
 }
+
+const themeGradients: Record<string, string> = {
+  emerald: 'from-emerald-700 via-emerald-600 to-teal-700',
+  amber: 'from-amber-700 via-amber-600 to-yellow-600',
+  rose: 'from-rose-700 via-rose-600 to-red-700',
+  blue: 'from-blue-700 via-blue-600 to-cyan-700',
+  indigo: 'from-indigo-800 via-indigo-600 to-violet-700',
+};
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -31,6 +45,10 @@ export default function HomePage() {
     is_open: true,
     schedule_text: 'Lunes a Sábado: 09:00 - 21:00 hrs',
     announcement_text: '',
+    store_name: 'Kaibutsu Market',
+    hero_title: 'Pide en línea y confirma directo por WhatsApp',
+    hero_subtitle: 'Elige tus productos, agrega al carrito y coordina la entrega directamente con nosotros.',
+    theme_color: 'emerald',
   });
 
   const fetchProducts = async () => {
@@ -78,16 +96,27 @@ export default function HomePage() {
     return matchesCategory && matchesSearch;
   });
 
+  const activeGradient =
+    themeGradients[settings.theme_color || 'emerald'] || themeGradients.emerald;
+
   return (
     <div className="space-y-6">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white p-6 sm:p-10 shadow-sm">
+      <section
+        className={`relative overflow-hidden rounded-3xl bg-linear-to-r ${activeGradient} text-white p-6 sm:p-10 shadow-sm transition-all duration-300`}
+      >
         <div className="relative z-10 max-w-2xl space-y-3">
+          {settings.store_name && (
+            <span className="inline-block px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold uppercase tracking-wider text-white">
+              {settings.store_name}
+            </span>
+          )}
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Pide en línea y confirma directo por WhatsApp
+            {settings.hero_title || 'Pide en línea y confirma directo por WhatsApp'}
           </h1>
-          <p className="text-emerald-50 text-sm sm:text-base font-medium">
-            Elige tus productos, agrega al carrito y coordina la entrega directamente con nosotros.
+          <p className="text-white/90 text-sm sm:text-base font-medium">
+            {settings.hero_subtitle ||
+              'Elige tus productos, agrega al carrito y coordina la entrega directamente con nosotros.'}
           </p>
         </div>
         <div className="absolute right-0 bottom-0 translate-x-8 translate-y-8 opacity-10 pointer-events-none">
