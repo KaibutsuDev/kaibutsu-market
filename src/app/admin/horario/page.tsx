@@ -185,7 +185,7 @@ export default function AdminHorarioPage() {
               {
                 id: 'neon',
                 title: 'Letrero Neón',
-                desc: 'Tubos brillantes luminosos estilo Open Sign',
+                desc: 'Tubos brillantes luminosos con efecto resplandor',
               },
               {
                 id: 'canopy',

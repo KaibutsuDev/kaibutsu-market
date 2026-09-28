@@ -70,14 +70,7 @@ export default function StoreSignage({
           </div>
 
           {/* Textos grabados */}
-          <div className="leading-tight">
-            <span
-              className={`block text-[9px] font-black uppercase tracking-widest ${
-                isOpen ? 'text-emerald-200' : 'text-neutral-400'
-              }`}
-            >
-              {isOpen ? '● Abierto al público' : '○ Cerrado por ahora'}
-            </span>
+          <div>
             <span className="block text-xs sm:text-sm font-extrabold tracking-tight drop-shadow-xs">
               {isOpen ? '¡ATENDIENDO AHORA!' : 'VOLVEMOS PRONTO'}
             </span>
@@ -94,34 +87,13 @@ export default function StoreSignage({
     return (
       <div className="relative inline-flex items-center select-none">
         <div
-          className={`relative px-4 py-2 rounded-2xl border transition-all duration-300 flex items-center gap-3 ${
+          className={`relative px-4 py-2 rounded-2xl border transition-all duration-300 flex items-center ${
             isOpen
               ? 'bg-neutral-950 border-emerald-500/70 shadow-[0_0_20px_rgba(16,185,129,0.35)]'
               : 'bg-neutral-950 border-neutral-800 shadow-[0_0_12px_rgba(0,0,0,0.5)]'
           }`}
         >
-          {/* Tubo de Neón Circular indicador */}
-          <div className="relative flex items-center justify-center">
-            {isOpen ? (
-              <span className="relative flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-400 shadow-[0_0_10px_#10b981]"></span>
-              </span>
-            ) : (
-              <span className="h-3 w-3 rounded-full bg-neutral-600 opacity-50"></span>
-            )}
-          </div>
-
-          <div className="text-left font-mono">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={`text-[9px] font-bold tracking-widest uppercase ${
-                  isOpen ? 'text-emerald-400 drop-shadow-[0_0_6px_#10b981]' : 'text-neutral-500'
-                }`}
-              >
-                OPEN SIGN
-              </span>
-            </div>
+          <div className="text-center font-mono">
             <span
               className={`block text-xs sm:text-sm font-black tracking-wider uppercase transition-colors ${
                 isOpen
@@ -181,14 +153,7 @@ export default function StoreSignage({
         }`}
       >
         <span className="text-base">{isOpen ? '🏪' : '🔒'}</span>
-        <div className="leading-tight">
-          <span
-            className={`block text-[9px] font-black uppercase tracking-wider ${
-              isOpen ? 'text-emerald-700' : 'text-neutral-500'
-            }`}
-          >
-            {isOpen ? 'Ventanilla abierta' : 'Persiana abajo'}
-          </span>
+        <div>
           <span className="block text-xs sm:text-sm font-bold text-neutral-900">
             {isOpen ? 'Atendiendo Ahora' : 'Cerrado por ahora'}
           </span>
