@@ -23,7 +23,8 @@ export function generateCustomerOrderWhatsAppLink(
   totalAmount: number,
   deliveryType: string,
   deliveryAddress?: string,
-  items?: { product_name: string; quantity: number; subtotal: number }[]
+  items?: { product_name: string; quantity: number; subtotal: number }[],
+  deliveryNotes?: string
 ): string {
   const phone = cleanPhone(storePhone);
   const deliveryText =
@@ -38,10 +39,13 @@ export function generateCustomerOrderWhatsAppLink(
       items.map((i) => `• ${i.quantity}x ${i.product_name} (${formatPrice(i.subtotal)})`).join('\n');
   }
 
+  const notesText = deliveryNotes ? `\n📝 *Indicaciones / Encargo:* ${deliveryNotes}` : '';
+
   const message = `🛒 *¡Hola Tienda! Acabo de realizar el Pedido #${orderNumber}*\n\n` +
     `👤 *Cliente:* ${customerName}\n` +
     `💰 *Total:* ${formatPrice(totalAmount)}\n` +
     `${deliveryText}` +
+    `${notesText}` +
     `${itemsDetail}\n\n` +
     `_Por favor confirmen recepción de mi pedido._`;
 

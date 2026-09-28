@@ -21,6 +21,9 @@ export default function CartPage() {
   const [error, setError] = useState<string | null>(null);
   const [createdOrder, setCreatedOrder] = useState<any | null>(null);
   const [storePhone, setStorePhone] = useState<string>('56912345678');
+  const [modulePedidosProgramados, setModulePedidosProgramados] = useState(false);
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduledDateTime, setScheduledDateTime] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -28,12 +31,15 @@ export default function CartPage() {
       setDeliveryAddress(user.default_address);
     }
 
-    // Obtener número configurado por el admin
+    // Obtener número y módulos configurados por el admin
     fetch('/api/settings')
       .then((res) => res.json())
       .then((data) => {
         if (data.settings?.store_phone) {
           setStorePhone(data.settings.store_phone);
+        }
+        if (data.settings?.module_pedidos_programados) {
+          setModulePedidosProgramados(true);
         }
       })
       .catch((e) => console.error(e));
@@ -56,7 +62,8 @@ export default function CartPage() {
       createdOrder.total_amount,
       createdOrder.delivery_type,
       createdOrder.delivery_address,
-      createdOrder.items
+      createdOrder.items,
+      createdOrder.delivery_notes
     );
 
     return (
@@ -168,6 +175,10 @@ export default function CartPage() {
     setError(null);
     setLoading(true);
 
+    const finalNotes = isScheduled && scheduledDateTime.trim()
+      ? `📅 [ENCARGO PROGRAMADO: ${scheduledDateTime.trim()}] ${deliveryNotes}`.trim()
+      : deliveryNotes;
+
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
@@ -175,7 +186,7 @@ export default function CartPage() {
         body: JSON.stringify({
           delivery_type: deliveryType,
           delivery_address: deliveryAddress,
-          delivery_notes: deliveryNotes,
+          delivery_notes: finalNotes,
           items: items.map((i) => ({
             product_id: i.product.id,
             quantity: i.quantity,
@@ -328,6 +339,63 @@ export default function CartPage() {
                 <span>Envío Domicilio</span>
               </button>
             </div>
+
+            {/* Módulo Pedidos Programados (si está habilitado en admin) */}
+            {modulePedidosProgramados && (
+              <div className="p-3.5 rounded-xl border border-amber-300/80 bg-amber-50/50 space-y-2.5">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-neutral-900 flex items-center gap-1.5">
+                    <span>📅</span> ¿Cuándo necesitas el pedido?
+                  </span>
+                  <span className="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">
+                    Módulo de Prueba • No incluido en Plan Base
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs font-medium">
+                  <button
+                    type="button"
+                    onClick={() => setIsScheduled(false)}
+                    className={`py-2 px-3 rounded-lg border text-center transition-all ${
+                      !isScheduled
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800 font-bold'
+                        : 'border-neutral-200 bg-white text-neutral-600'
+                    }`}
+                  >
+                    Preparar Ahora (Inmediato)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsScheduled(true)}
+                    className={`py-2 px-3 rounded-lg border text-center transition-all ${
+                      isScheduled
+                        ? 'border-amber-600 bg-amber-100 text-amber-900 font-bold'
+                        : 'border-neutral-200 bg-white text-neutral-600'
+                    }`}
+                  >
+                    Encargo Programado
+                  </button>
+                </div>
+
+                {isScheduled && (
+                  <div className="pt-2 space-y-1.5 border-t border-amber-200/60">
+                    <label className="block text-[11px] font-bold text-neutral-800">
+                      Fecha y Hora de Retiro o Entrega:
+                    </label>
+                    <input
+                      type="text"
+                      value={scheduledDateTime}
+                      onChange={(e) => setScheduledDateTime(e.target.value)}
+                      placeholder="Ej. Sábado 13:00 hrs o 2026-10-02 18:30"
+                      className="w-full px-3 py-2 text-xs bg-white rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                    />
+                    <p className="text-[10px] text-amber-900">
+                      * Ideal para bandejas de empanadas, tortas o eventos. El abono se coordina por WhatsApp.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {deliveryType === 'delivery' && (
               <div className="space-y-2 pt-2 border-t border-neutral-100">

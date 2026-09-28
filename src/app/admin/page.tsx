@@ -37,6 +37,10 @@ export default function AdminDashboardPage() {
     store_phone: '56912345678',
     schedule_text: '',
     announcement_text: '',
+    module_ofertas_relampago: false,
+    module_combos_dia: false,
+    module_vitrina_pan: false,
+    module_pedidos_programados: false,
   });
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -104,6 +108,10 @@ export default function AdminDashboardPage() {
           store_phone: data.settings.store_phone || '56912345678',
           schedule_text: data.settings.schedule_text || '',
           announcement_text: data.settings.announcement_text || '',
+          module_ofertas_relampago: Boolean(data.settings.module_ofertas_relampago),
+          module_combos_dia: Boolean(data.settings.module_combos_dia),
+          module_vitrina_pan: Boolean(data.settings.module_vitrina_pan),
+          module_pedidos_programados: Boolean(data.settings.module_pedidos_programados),
         });
       }
     } catch (e) {
@@ -844,6 +852,157 @@ export default function AdminDashboardPage() {
                       </span>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+
+            {/* SECCIÓN MÓDULOS DE VENTA ACTIVA (ADD-ONS DE PRUEBA / PLAN PRO) */}
+            <div className="pt-6 border-t border-neutral-200 space-y-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-sm font-bold text-neutral-900">
+                    Módulos Tácticos de Venta Activa
+                  </h3>
+                  <span className="bg-amber-50 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-amber-200">
+                    Módulos de Prueba • No incluidos en Plan Base
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Activa individualmente cada módulo para probar cómo aumenta el ticket promedio y la rotación en la tienda de tus clientes.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {/* 1. Ofertas Relámpago */}
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">⚡</span>
+                      <span className="text-sm font-bold text-neutral-900">
+                        Ofertas Relámpago con Cuenta Regresiva
+                      </span>
+                    </div>
+                    <span className="text-xs text-neutral-500 font-medium block mt-0.5">
+                      Muestra un producto en liquidación con reloj regresivo y barra de stock en urgencia.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setStoreSettings({
+                        ...storeSettings,
+                        module_ofertas_relampago: !storeSettings.module_ofertas_relampago,
+                      })
+                    }
+                    className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      storeSettings.module_ofertas_relampago ? 'bg-emerald-600' : 'bg-neutral-300'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        storeSettings.module_ofertas_relampago ? 'translate-x-6' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* 2. Combos del Día */}
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">⭐</span>
+                      <span className="text-sm font-bold text-neutral-900">
+                        Combos Sugeridos del Día (Once Completa)
+                      </span>
+                    </div>
+                    <span className="text-xs text-neutral-500 font-medium block mt-0.5">
+                      Sugiere packs completos con descuento (Hallulla + Cecina + Queso + Té) y 1 toque al carrito.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setStoreSettings({
+                        ...storeSettings,
+                        module_combos_dia: !storeSettings.module_combos_dia,
+                      })
+                    }
+                    className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      storeSettings.module_combos_dia ? 'bg-emerald-600' : 'bg-neutral-300'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        storeSettings.module_combos_dia ? 'translate-x-6' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* 3. Vitrina de Pan Caliente */}
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">🥖</span>
+                      <span className="text-sm font-bold text-neutral-900">
+                        Vitrina de Pan Caliente y Recién Horneados
+                      </span>
+                    </div>
+                    <span className="text-xs text-neutral-500 font-medium block mt-0.5">
+                      Avisa a los vecinos tandas de pan saliendo del horno en vivo con reserva directa de kilos.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setStoreSettings({
+                        ...storeSettings,
+                        module_vitrina_pan: !storeSettings.module_vitrina_pan,
+                      })
+                    }
+                    className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      storeSettings.module_vitrina_pan ? 'bg-emerald-600' : 'bg-neutral-300'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        storeSettings.module_vitrina_pan ? 'translate-x-6' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* 4. Pedidos Programados */}
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">📅</span>
+                      <span className="text-sm font-bold text-neutral-900">
+                        Pedidos Programados y Encargos Anticipados
+                      </span>
+                    </div>
+                    <span className="text-xs text-neutral-500 font-medium block mt-0.5">
+                      Habilita en el carrito la opción de encargar con fecha y hora futura para tortas y empanadas.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setStoreSettings({
+                        ...storeSettings,
+                        module_pedidos_programados: !storeSettings.module_pedidos_programados,
+                      })
+                    }
+                    className={`relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      storeSettings.module_pedidos_programados ? 'bg-emerald-600' : 'bg-neutral-300'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        storeSettings.module_pedidos_programados ? 'translate-x-6' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
                 </div>
               </div>
             </div>

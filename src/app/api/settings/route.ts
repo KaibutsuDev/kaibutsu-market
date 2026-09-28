@@ -14,6 +14,10 @@ export async function GET() {
           store_phone: '56912345678',
           schedule_text: 'Lunes a Sábado: 09:00 - 21:00 hrs',
           announcement_text: '¡Estamos atendiendo pedidos!',
+          module_ofertas_relampago: false,
+          module_combos_dia: false,
+          module_vitrina_pan: false,
+          module_pedidos_programados: false,
         },
       });
     }
@@ -31,7 +35,16 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
-    const { is_open, store_phone, schedule_text, announcement_text } = await req.json();
+    const {
+      is_open,
+      store_phone,
+      schedule_text,
+      announcement_text,
+      module_ofertas_relampago,
+      module_combos_dia,
+      module_vitrina_pan,
+      module_pedidos_programados,
+    } = await req.json();
 
     const updated = await sql`
       UPDATE minimarket.store_settings
@@ -40,6 +53,10 @@ export async function PUT(req: Request) {
         store_phone = ${store_phone !== undefined ? store_phone.trim() : '56912345678'},
         schedule_text = ${schedule_text !== undefined ? schedule_text.trim() : 'Lunes a Sábado: 09:00 - 21:00 hrs'},
         announcement_text = ${announcement_text !== undefined ? announcement_text.trim() : ''},
+        module_ofertas_relampago = ${module_ofertas_relampago !== undefined ? Boolean(module_ofertas_relampago) : false},
+        module_combos_dia = ${module_combos_dia !== undefined ? Boolean(module_combos_dia) : false},
+        module_vitrina_pan = ${module_vitrina_pan !== undefined ? Boolean(module_vitrina_pan) : false},
+        module_pedidos_programados = ${module_pedidos_programados !== undefined ? Boolean(module_pedidos_programados) : false},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = 'current'
       RETURNING *

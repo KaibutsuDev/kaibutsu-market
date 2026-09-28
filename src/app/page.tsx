@@ -5,10 +5,18 @@ import { Product } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
 import { Search, ShoppingBag, Sparkles, Filter, Clock, Store } from 'lucide-react';
 
+import FlashSaleModule from '@/components/modules/FlashSaleModule';
+import CombosModule from '@/components/modules/CombosModule';
+import FreshBreadModule from '@/components/modules/FreshBreadModule';
+
 interface StoreSettings {
   is_open: boolean;
   schedule_text: string;
   announcement_text?: string;
+  module_ofertas_relampago?: boolean;
+  module_combos_dia?: boolean;
+  module_vitrina_pan?: boolean;
+  module_pedidos_programados?: boolean;
 }
 
 export default function HomePage() {
@@ -130,6 +138,11 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* MÓDULOS DE VENTA ACTIVA (ACTIVADOS DESDE PANEL ADMIN) */}
+      {settings.module_ofertas_relampago && <FlashSaleModule />}
+      {settings.module_combos_dia && <CombosModule />}
+      {settings.module_vitrina_pan && <FreshBreadModule />}
 
       {/* Search and Filters Bar */}
       <section className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
